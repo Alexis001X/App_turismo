@@ -39,3 +39,7 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# Firebase Admin SDK - ¡NUNCA subir al repositorio!
+serviceAccountKey.json
+*.serviceAccount.json
