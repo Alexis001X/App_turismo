@@ -7,7 +7,6 @@ import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
 
-// Nota: getAnalytics NO es compatible con React Native, se omite
 const firebaseConfig = {
   apiKey: "AIzaSyD7as61o3m_6X9dVy5CGaiqpJ4DVdV-qAI",
   authDomain: "appturismo-7b724.firebaseapp.com",
@@ -18,15 +17,12 @@ const firebaseConfig = {
   measurementId: "G-CC5CMN9778"
 };
 
-// Inicializar Firebase
 const app = initializeApp(firebaseConfig);
 
-// Auth con persistencia en AsyncStorage (sesión sobrevive al cierre de la app)
 export const auth = initializeAuth(app, {
   persistence: getReactNativePersistence(ReactNativeAsyncStorage),
 });
 
-// Firestore y Storage
 export const db = getFirestore(app);
 export const storage = getStorage(app);
 

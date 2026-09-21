@@ -14,7 +14,9 @@ import {
 } from 'react-native';
 import { Text, Chip, ActivityIndicator } from 'react-native-paper';
 import { StatusBar } from 'expo-status-bar';
+import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../hooks/useAuth';
+import { useAdminRole } from '../hooks/useAdminRole';
 import { getDestinations } from '../firebase/firestore';
 import DestinationCard from '../components/DestinationCard';
 import SearchBar from '../components/SearchBar';
@@ -25,6 +27,7 @@ const CATEGORIES = ['Todos', 'Playa', 'Montaña', 'Ciudad', 'Cultural', 'Aventur
 
 export default function HomeScreen({ navigation }) {
   const { user } = useAuth();
+  const { isAdmin } = useAdminRole();
   const [destinations, setDestinations] = useState([]);
   const [filtered, setFiltered] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -150,12 +153,40 @@ export default function HomeScreen({ navigation }) {
 
         <View style={{ height: spacing['2xl'] }} />
       </ScrollView>
+
+      {/* FAB Admin – solo visible para administradores */}
+      {isAdmin && (
+        <TouchableOpacity
+          id="home-admin-fab"
+          style={styles.fab}
+          onPress={() => navigation.navigate('AdminPanel')}
+          activeOpacity={0.85}
+        >
+          <Ionicons name="construct-outline" size={24} color={colors.white} />
+        </TouchableOpacity>
+      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
+  container: { flex: 1, backgroundColor: colors.background, position: 'relative' },
+  fab: {
+    position: 'absolute',
+    bottom: 24,
+    right: 24,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 8,
+    shadowColor: colors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.35,
+    shadowRadius: 8,
+  },
   header: {
     backgroundColor: colors.primary,
     paddingTop: 60,

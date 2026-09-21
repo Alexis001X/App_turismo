@@ -67,20 +67,47 @@ export const getAllUsers = async () => {
 // ═══════════════════════════════════════════════════════════
 
 /**
- * Obtener todos los destinos turísticos
- * Estructura: { nombre, descripcion, fotos[], contacto, categoria, createdAt }
+ * Mapea campos en español de Firestore → campos en inglés que usa la UI
+ * (DestinationCard, DestinationDetailScreen, HomeScreen, ExploreScreen)
  */
+const mapDestino = (id, data) => ({
+  id,
+  // ── Campos en inglés que consume la UI ─────────────────────
+  name:        data.nombre        || '',
+  description: data.descripcion   || '',
+  country:     data.pais          || '',
+  category:    data.categoria     || '',
+  price:       data.precio        ?? null,
+  duration:    data.duracion      || '',
+  rating:      data.rating        ?? null,
+  imageUrl:    Array.isArray(data.fotos) && data.fotos.length > 0
+                 ? data.fotos[0]
+                 : (data.imageUrl || null),
+  // ── Campos originales en español (para edición/CRUD) ───────
+  nombre:      data.nombre        || '',
+  descripcion: data.descripcion   || '',
+  fotos:       data.fotos         || [],
+  contacto:    data.contacto      || '',
+  categoria:   data.categoria     || '',
+  pais:        data.pais          || '',
+  precio:      data.precio        ?? null,
+  duracion:    data.duracion      || '',
+  createdAt:   data.createdAt,
+  updatedAt:   data.updatedAt,
+});
+
+/** Obtener todos los destinos turísticos */
 export const getDestinos = async () => {
   const q = query(collection(db, COLLECTIONS.DESTINOS), orderBy('createdAt', 'desc'));
   const snapshot = await getDocs(q);
-  return snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+  return snapshot.docs.map((d) => mapDestino(d.id, d.data()));
 };
 
 /** Obtener un destino por ID */
 export const getDestinoById = async (id) => {
   const docRef = doc(db, COLLECTIONS.DESTINOS, id);
   const docSnap = await getDoc(docRef);
-  if (docSnap.exists()) return { id: docSnap.id, ...docSnap.data() };
+  if (docSnap.exists()) return mapDestino(docSnap.id, docSnap.data());
   return null;
 };
 
@@ -254,3 +281,10 @@ export const getDestinations = getDestinos;
 export const getDestinationById = getDestinoById;
 /** @deprecated Usar getDestinosByCategoria */
 export const getDestinationsByCategory = getDestinosByCategoria;
+
+// ─── RESEÑAS (Mock temporal o implementación vacía) ────────
+export const getDestinationReviews = async (destinoId) => {
+  // Retorna un arreglo vacío para evitar que la pantalla falle
+  // Si en el futuro agregas colección de reseñas, impleméntalo aquí.
+  return [];
+};

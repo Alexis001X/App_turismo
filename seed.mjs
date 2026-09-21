@@ -23,12 +23,12 @@ const SERVICE_ACCOUNT_PATH = './serviceAccountKey.json';
 let app;
 try {
   const { default: serviceAccount } = await import(SERVICE_ACCOUNT_PATH, {
-    assert: { type: 'json' },
+    with: { type: 'json' },
   });
   app = initializeApp({ credential: cert(serviceAccount) });
 } catch (e) {
-  console.error('❌ No se encontró serviceAccountKey.json');
-  console.error('   Descárgalo desde Firebase Console → Configuración → Cuentas de servicio');
+  console.error('❌ Error al cargar serviceAccountKey.json:', e);
+  console.error('   Asegúrate de haberlo descargado correctamente y que sea un JSON válido.');
   process.exit(1);
 }
 

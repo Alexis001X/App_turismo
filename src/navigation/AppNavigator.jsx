@@ -17,6 +17,7 @@ import ExploreScreen from '../screens/ExploreScreen';
 import DestinationDetailScreen from '../screens/DestinationDetailScreen';
 import BookingScreen from '../screens/BookingScreen';
 import ProfileScreen from '../screens/ProfileScreen';
+import AdminPanelScreen from '../screens/AdminPanelScreen';
 
 // Hooks & Theme
 import { useAuth } from '../hooks/useAuth';
@@ -85,6 +86,11 @@ function AppStack() {
       <Stack.Screen
         name="Booking"
         component={BookingScreen}
+        options={{ presentation: 'modal' }}
+      />
+      <Stack.Screen
+        name="AdminPanel"
+        component={AdminPanelScreen}
         options={{ presentation: 'modal' }}
       />
     </Stack.Navigator>
