@@ -31,7 +31,10 @@ yarn-error.*
 *.pem
 
 # local env files
+.env
+.env.*
 .env*.local
+*.local
 
 # typescript
 *.tsbuildinfo
@@ -40,6 +43,26 @@ yarn-error.*
 /ios
 /android
 
-# Firebase Admin SDK - ¡NUNCA subir al repositorio!
+# ─── FIREBASE & CREDENCIALES ─────────────────────────────────
+# Firebase Admin SDK — ¡NUNCA subir al repositorio!
 serviceAccountKey.json
 *.serviceAccount.json
+# Cualquier otro archivo de clave de servicio
+*-firebase-adminsdk-*.json
+google-services.json
+GoogleService-Info.plist
+
+# ─── DOCUMENTOS INTERNOS (no subir a GitHub) ─────────────────
+PROYECTO_CONTEXTO.md
+
+# ─── SCRIPTS DE PRUEBA Y SEED ────────────────────────────────
+# Estos archivos usan el Admin SDK y requieren serviceAccountKey.json
+# Comenta las siguientes líneas si quieres incluirlos en el repositorio
+# seed.mjs
+# test-add-destino.mjs
+
+# ─── EDITOR / IDE ────────────────────────────────────────────
+.vscode/settings.json
+.claude/
+*.swp
+*.swo
