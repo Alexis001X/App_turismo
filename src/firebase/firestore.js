@@ -118,19 +118,29 @@ export const getDestinosByCategoria = async (categoria) => {
     where('categoria', '==', categoria)
   );
   const snapshot = await getDocs(q);
-  return snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+  return snapshot.docs.map((d) => mapDestino(d.id, d.data()));
 };
 
-/** Crear nuevo destino (admin) */
+/**
+ * Crear nuevo destino (admin)
+ * ─── Todos los campos que existen en Firestore deben guardarse aquí ───
+ * Estructura real (verificada via MCP 2025-09):
+ *   nombre, descripcion, fotos[], contacto, categoria, pais,
+ *   precio (number), duracion, rating (number), createdAt, updatedAt
+ */
 export const createDestino = async (data) => {
   const docRef = await addDoc(collection(db, COLLECTIONS.DESTINOS), {
-    nombre: data.nombre || '',
+    nombre:      data.nombre      || '',
     descripcion: data.descripcion || '',
-    fotos: data.fotos || [],           // array de URLs
-    contacto: data.contacto || '',
-    categoria: data.categoria || '',
-    createdAt: serverTimestamp(),
-    updatedAt: serverTimestamp(),
+    fotos:       Array.isArray(data.fotos) ? data.fotos : [],
+    contacto:    data.contacto    || '',
+    categoria:   data.categoria   || '',
+    pais:        data.pais        || '',
+    precio:      data.precio != null ? Number(data.precio) : null,
+    duracion:    data.duracion    || '',
+    rating:      data.rating  != null ? Number(data.rating)  : null,
+    createdAt:   serverTimestamp(),
+    updatedAt:   serverTimestamp(),
   });
   return docRef.id;
 };
@@ -138,7 +148,18 @@ export const createDestino = async (data) => {
 /** Actualizar destino (admin) */
 export const updateDestino = async (id, data) => {
   const docRef = doc(db, COLLECTIONS.DESTINOS, id);
-  await updateDoc(docRef, { ...data, updatedAt: serverTimestamp() });
+  await updateDoc(docRef, {
+    nombre:      data.nombre      || '',
+    descripcion: data.descripcion || '',
+    fotos:       Array.isArray(data.fotos) ? data.fotos : [],
+    contacto:    data.contacto    || '',
+    categoria:   data.categoria   || '',
+    pais:        data.pais        || '',
+    precio:      data.precio != null ? Number(data.precio) : null,
+    duracion:    data.duracion    || '',
+    rating:      data.rating  != null ? Number(data.rating)  : null,
+    updatedAt:   serverTimestamp(),
+  });
 };
 
 /** Eliminar destino (admin) */
@@ -152,7 +173,7 @@ export const deleteDestino = async (id) => {
 
 /**
  * Obtener todos los hospedajes
- * Estructura: { nombre, lugar, precio, imagenes[], descripcion, createdAt }
+ * Estructura: { nombre, lugar, precio, imagenes[], descripcion, estrellas, createdAt }
  */
 export const getHospedajes = async () => {
   const q = query(collection(db, COLLECTIONS.HOSPEDAJES), orderBy('createdAt', 'desc'));
@@ -181,13 +202,14 @@ export const getHospedajesByLugar = async (lugar) => {
 /** Crear nuevo hospedaje (admin) */
 export const createHospedaje = async (data) => {
   const docRef = await addDoc(collection(db, COLLECTIONS.HOSPEDAJES), {
-    nombre: data.nombre || '',
-    lugar: data.lugar || '',
-    precio: data.precio || 0,          // precio por noche en USD
-    imagenes: data.imagenes || [],     // array de URLs
+    nombre:      data.nombre      || '',
+    lugar:       data.lugar       || '',
+    precio:      data.precio != null ? Number(data.precio) : null,
+    imagenes:    Array.isArray(data.imagenes) ? data.imagenes : [],
     descripcion: data.descripcion || '',
-    createdAt: serverTimestamp(),
-    updatedAt: serverTimestamp(),
+    estrellas:   data.estrellas != null ? Number(data.estrellas) : null,
+    createdAt:   serverTimestamp(),
+    updatedAt:   serverTimestamp(),
   });
   return docRef.id;
 };
@@ -195,7 +217,15 @@ export const createHospedaje = async (data) => {
 /** Actualizar hospedaje (admin) */
 export const updateHospedaje = async (id, data) => {
   const docRef = doc(db, COLLECTIONS.HOSPEDAJES, id);
-  await updateDoc(docRef, { ...data, updatedAt: serverTimestamp() });
+  await updateDoc(docRef, {
+    nombre:      data.nombre      || '',
+    lugar:       data.lugar       || '',
+    precio:      data.precio != null ? Number(data.precio) : null,
+    imagenes:    Array.isArray(data.imagenes) ? data.imagenes : [],
+    descripcion: data.descripcion || '',
+    estrellas:   data.estrellas != null ? Number(data.estrellas) : null,
+    updatedAt:   serverTimestamp(),
+  });
 };
 
 /** Eliminar hospedaje (admin) */
@@ -209,39 +239,63 @@ export const deleteHospedaje = async (id) => {
 
 /**
  * Crear una nueva reservación
- * Estructura: { codigoUnico, hotelId, hotelNombre, lugarId, lugarNombre,
- *               precio, userId, userEmail, fechaEntrada, fechaSalida,
- *               estado, createdAt }
+ *
+ * Estructura en Firestore /reservaciones/{id}:
+ *   codigoUnico    string   → generado automáticamente (RES-XXXXX-XXXX)
+ *   lugarId        string   → ID del destino
+ *   lugarNombre    string   → Nombre del destino
+ *   hotelId        string   → ID del hospedaje (opcional)
+ *   hotelNombre    string   → Nombre del hospedaje (opcional)
+ *   precio         number   → Total USD
+ *   userId         string   → UID del usuario autenticado
+ *   userEmail      string   → Email del usuario
+ *   fechaEntrada   string   → DD/MM/AAAA
+ *   fechaSalida    string   → DD/MM/AAAA
+ *   viajeros       number   → Número de viajeros
+ *   notas          string   → Notas especiales
+ *   estado         string   → 'pendiente' | 'confirmada' | 'cancelada'
+ *   createdAt      Timestamp
+ *   updatedAt      Timestamp
  */
 export const createReservacion = async (data) => {
   const codigoUnico = generateBookingCode();
   const docRef = await addDoc(collection(db, COLLECTIONS.RESERVACIONES), {
     codigoUnico,
-    hotelId: data.hotelId || '',
-    hotelNombre: data.hotelNombre || '',
-    lugarId: data.lugarId || '',
-    lugarNombre: data.lugarNombre || '',
-    precio: data.precio || 0,
-    userId: data.userId || '',
-    userEmail: data.userEmail || '',
+    lugarId:      data.lugarId      || '',
+    lugarNombre:  data.lugarNombre  || '',
+    hotelId:      data.hotelId      || '',
+    hotelNombre:  data.hotelNombre  || '',
+    precio:       data.precio != null ? Number(data.precio) : 0,
+    userId:       data.userId       || '',
+    userEmail:    data.userEmail    || '',
     fechaEntrada: data.fechaEntrada || '',
-    fechaSalida: data.fechaSalida || '',
-    estado: 'pendiente',               // 'pendiente' | 'confirmada' | 'cancelada'
-    createdAt: serverTimestamp(),
-    updatedAt: serverTimestamp(),
+    fechaSalida:  data.fechaSalida  || '',
+    viajeros:     data.viajeros != null ? Number(data.viajeros) : 1,
+    notas:        data.notas        || '',
+    estado:       'pendiente',
+    createdAt:    serverTimestamp(),
+    updatedAt:    serverTimestamp(),
   });
   return { id: docRef.id, codigoUnico };
 };
 
-/** Obtener reservaciones del usuario actual */
+/** Obtener reservaciones del usuario actual (ordenadas por fecha descendente) */
 export const getReservacionesByUser = async (userId) => {
+  // ⚠️ No usamos orderBy('createdAt') aquí porque combinarlo con where()
+  // requiere un índice compuesto en Firestore que puede no existir.
+  // Ordenamos en el cliente para evitar el error failed-precondition.
   const q = query(
     collection(db, COLLECTIONS.RESERVACIONES),
-    where('userId', '==', userId),
-    orderBy('createdAt', 'desc')
+    where('userId', '==', userId)
   );
   const snapshot = await getDocs(q);
-  return snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+  const docs = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+  // Ordenar por createdAt descendente (más reciente primero)
+  return docs.sort((a, b) => {
+    const ta = a.createdAt?.toMillis?.() ?? 0;
+    const tb = b.createdAt?.toMillis?.() ?? 0;
+    return tb - ta;
+  });
 };
 
 /** Obtener todas las reservaciones (admin) */
@@ -268,23 +322,39 @@ export const cancelarReservacion = async (id) => {
   await updateEstadoReservacion(id, 'cancelada');
 };
 
-// ─── Mantener compatibilidad con BookingScreen existente ───
-/** @deprecated Usar createReservacion */
-export const createBooking = createReservacion;
-/** @deprecated Usar getReservacionesByUser */
+// ═══════════════════════════════════════════════════════════
+// PUENTES DE COMPATIBILIDAD (BookingScreen → Firestore)
+// ═══════════════════════════════════════════════════════════
+
+/**
+ * BookingScreen llama a createBooking con campos en inglés:
+ *   { destinationId, destinationName, userId, userEmail,
+ *     checkIn, checkOut, travelers, notes, totalPrice }
+ *
+ * Este puente los mapea a los campos en español de createReservacion.
+ */
+export const createBooking = async (data) =>
+  createReservacion({
+    lugarId:      data.destinationId   || '',
+    lugarNombre:  data.destinationName || '',
+    hotelId:      '',
+    hotelNombre:  '',
+    precio:       data.totalPrice      ?? 0,
+    userId:       data.userId          || '',
+    userEmail:    data.userEmail       || '',
+    fechaEntrada: data.checkIn         || '',
+    fechaSalida:  data.checkOut        || '',
+    viajeros:     data.travelers != null ? Number(data.travelers) : 1,
+    notas:        data.notes           || '',
+  });
+
+/** Alias para obtener reservaciones propias */
 export const getUserBookings = getReservacionesByUser;
 
-// ─── Mantener compatibilidad con código anterior ───────────
-/** @deprecated Usar getDestinos */
+// ─── Aliases para compatibilidad con pantallas existentes ───
 export const getDestinations = getDestinos;
-/** @deprecated Usar getDestinoById */
 export const getDestinationById = getDestinoById;
-/** @deprecated Usar getDestinosByCategoria */
 export const getDestinationsByCategory = getDestinosByCategoria;
 
-// ─── RESEÑAS (Mock temporal o implementación vacía) ────────
-export const getDestinationReviews = async (destinoId) => {
-  // Retorna un arreglo vacío para evitar que la pantalla falle
-  // Si en el futuro agregas colección de reseñas, impleméntalo aquí.
-  return [];
-};
+// ─── RESEÑAS (placeholder — sin colección aún) ─────────────
+export const getDestinationReviews = async (_destinoId) => [];

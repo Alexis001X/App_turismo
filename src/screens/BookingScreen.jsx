@@ -50,7 +50,7 @@ export default function BookingScreen({ route, navigation }) {
       Alert.alert(
         '¡Reserva confirmada! 🎉',
         `Tu reserva para ${destination.name} ha sido registrada con éxito.`,
-        [{ text: 'OK', onPress: () => navigation.navigate('Home') }]
+        [{ text: 'OK', onPress: () => navigation.navigate('MainTabs') }]
       );
     } catch (error) {
       Alert.alert('Error', 'No se pudo completar la reserva. Intenta de nuevo.');
