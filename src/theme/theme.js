@@ -1,10 +1,5 @@
-// ============================================================
-// TEMA – React Native Paper + colores de la app
-// ============================================================
-
+﻿
 import { MD3LightTheme, MD3DarkTheme } from 'react-native-paper';
-
-// Paleta de colores principal
 export const colors = {
   primary: '#1A6B5A',       // Verde turquesa profundo
   primaryLight: '#2E9E80',
@@ -25,14 +20,10 @@ export const colors = {
   white: '#FFFFFF',
   black: '#000000',
   overlay: 'rgba(0,0,0,0.5)',
-
-  // Gradientes (arrays para LinearGradient)
   gradientPrimary: ['#1A6B5A', '#2E9E80'],
   gradientHero: ['#0F4A3D', '#1A6B5A', '#2E9E80'],
   gradientCard: ['rgba(0,0,0,0)', 'rgba(0,0,0,0.65)'],
 };
-
-// Tipografías
 export const typography = {
   fontFamily: {
     regular: 'System',
@@ -55,8 +46,6 @@ export const typography = {
     relaxed: 1.75,
   },
 };
-
-// Espaciado
 export const spacing = {
   xs: 4,
   sm: 8,
@@ -66,8 +55,6 @@ export const spacing = {
   '2xl': 48,
   '3xl': 64,
 };
-
-// Bordes
 export const borderRadius = {
   sm: 6,
   md: 12,
@@ -75,8 +62,6 @@ export const borderRadius = {
   xl: 24,
   full: 9999,
 };
-
-// Sombras
 export const shadows = {
   sm: {
     shadowColor: '#000',
@@ -100,8 +85,6 @@ export const shadows = {
     elevation: 10,
   },
 };
-
-// Tema claro para React Native Paper
 export const lightTheme = {
   ...MD3LightTheme,
   colors: {
@@ -119,8 +102,6 @@ export const lightTheme = {
     onSurface: colors.text,
   },
 };
-
-// Tema oscuro para React Native Paper
 export const darkTheme = {
   ...MD3DarkTheme,
   colors: {

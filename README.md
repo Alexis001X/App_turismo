@@ -1,11 +1,11 @@
 # 🌎 AppTurismo — Aplicación Móvil de Turismo
 
 [![Expo SDK](https://img.shields.io/badge/Expo%20SDK-57-blue?logo=expo)](https://expo.dev)
-[![Firebase](https://img.shields.io/badge/Firebase-Firestore%20%2B%20Auth-orange?logo=firebase)](https://firebase.google.com)
+[![Firebase](https://img.shields.io/badge/Firebase-Firestore%20%2B%20Auth%20%2B%20Storage-orange?logo=firebase)](https://firebase.google.com)
 [![React Native](https://img.shields.io/badge/React%20Native-0.76-61DAFB?logo=react)](https://reactnative.dev)
 [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
-Aplicación móvil de turismo construida con **React Native + Expo**, usando **Firebase** como backend y base de datos. Permite a los usuarios explorar destinos turísticos, ver hospedajes disponibles, realizar reservaciones y gestionar su perfil. Los administradores cuentan con un panel CRUD para gestionar el contenido de la plataforma.
+Aplicación móvil de turismo construida con **React Native + Expo SDK 57**, usando **Firebase** como backend completo (Auth, Firestore, Storage). Permite a los usuarios explorar destinos turísticos, ver hospedajes disponibles, realizar reservaciones con selector de fecha nativo y gestionar su perfil. Los administradores cuentan con un panel CRUD para gestionar destinos, hospedajes e imágenes directamente desde el dispositivo.
 
 ---
 
@@ -15,11 +15,13 @@ Aplicación móvil de turismo construida con **React Native + Expo**, usando **F
 |---|---|
 | 🔐 Autenticación | Registro e inicio de sesión con Email/Password via Firebase Auth |
 | 🌍 Destinos | Exploración de destinos turísticos con filtros por categoría y búsqueda |
-| 🏨 Hospedajes | Listado de hoteles y alojamientos disponibles |
-| 📅 Reservaciones | Sistema de reserva vinculado al usuario autenticado |
-| 👤 Perfil | Gestión de datos personales del usuario |
+| 🏨 Hospedajes | Listado de hoteles y alojamientos vinculados a destinos |
+| 📅 Reservaciones | Sistema de reserva con selector de fecha nativo (DateTimePicker) |
+| 👤 Perfil | Gestión de datos personales + panel de "Mis Reservas" en formato ticket |
 | 🛠️ Panel Admin | CRUD completo de destinos y hospedajes (solo rol `admin`) |
 | 🔒 Roles | Sistema de roles `admin` / `user` gestionado en Firestore |
+| 🖼️ Subida de imágenes | Galería del dispositivo → Firebase Storage (base64 via expo-file-system) |
+| 🗺️ Combobox destinos | Selector modal de destinos en formulario de hospedajes |
 
 ---
 
@@ -31,6 +33,9 @@ Aplicación móvil de turismo construida con **React Native + Expo**, usando **F
 - **Navegación:** React Navigation (Stack + Bottom Tabs)
 - **Iconos:** @expo/vector-icons (Ionicons + MaterialCommunityIcons)
 - **Gestor de paquetes:** pnpm
+- **Fecha nativa:** @react-native-community/datetimepicker
+- **Sistema de archivos:** expo-file-system (legacy API)
+- **Selector de imágenes:** expo-image-picker
 
 ---
 
@@ -56,7 +61,7 @@ pnpm install
 #    → Ver sección "Configuración Firebase" más abajo
 
 # 4. Iniciar el servidor de desarrollo
-pnpm exec expo start
+pnpm exec expo start --clear
 ```
 
 Escanea el código QR con la app **Expo Go** en tu dispositivo.
@@ -65,7 +70,7 @@ Escanea el código QR con la app **Expo Go** en tu dispositivo.
 
 ## 🔥 Configuración Firebase
 
-> ⚠️ **El archivo `firebaseConfig.js` contiene las credenciales del proyecto.** No compartas este archivo públicamente en repositorios abiertos.
+> ⚠️ **El archivo `firebaseConfig.js` contiene las credenciales del proyecto.** No compartas este archivo públicamente en repositorios abiertos. Está incluido en `.gitignore`.
 
 1. Ve a [Firebase Console](https://console.firebase.google.com)
 2. Crea o selecciona tu proyecto
@@ -73,26 +78,34 @@ Escanea el código QR con la app **Expo Go** en tu dispositivo.
 4. Habilita los siguientes servicios:
    - **Authentication** → Email/Password
    - **Firestore Database** → Modo producción
-   - **Storage** (opcional para imágenes)
+   - **Storage** → Para imágenes de destinos y hospedajes
 
-### Colecciones Firestore requeridas
+### Colecciones Firestore
 
 | Colección | Campos principales |
 |---|---|
 | `users` | `uid`, `nombre`, `email`, `cedula`, `direccion`, `ciudad`, `rol` |
 | `destinos` | `nombre`, `descripcion`, `fotos[]`, `contacto`, `categoria`, `pais`, `precio`, `duracion`, `rating` |
-| `hospedajes` | `nombre`, `lugar`, `precio`, `imagenes[]`, `descripcion`, `estrellas` |
-| `reservaciones` | `codigo`, `userId`, `hospedaje`, `destino`, `precio`, `estado` |
+| `hospedajes` | `nombre`, `lugar`, `lugarId`, `precio`, `imagenes[]`, `descripcion`, `estrellas` |
+| `reservaciones` | `codigo`, `userId`, `userEmail`, `lugarId`, `lugarNombre`, `hotelId`, `hotelNombre`, `fechaEntrada`, `fechaSalida`, `viajeros`, `precio`, `notas`, `estado`, `createdAt` |
 
-### Inicialización con datos de prueba
+### Reglas de Storage recomendadas
 
-```bash
-# Requiere serviceAccountKey.json descargado de Firebase Console
-# → Configuración del proyecto → Cuentas de servicio → Generar nueva clave privada
-node seed.mjs
 ```
-
-> ⚠️ Elimina `serviceAccountKey.json` después de ejecutar el seed. Nunca lo subas al repositorio.
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /destinos/{allPaths=**} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+    match /hospedajes/{allPaths=**} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+  }
+}
+```
 
 ---
 
@@ -101,27 +114,43 @@ node seed.mjs
 ```
 App_turismo/
 ├── src/
-│   ├── components/       # Componentes reutilizables (DestinationCard, SearchBar, etc.)
-│   ├── firebase/         # Configuración y operaciones Firebase
-│   │   ├── firebaseConfig.js   # SDK config (⚠️ contiene credenciales)
-│   │   ├── auth.js             # Funciones de autenticación
-│   │   ├── firestore.js        # CRUD de colecciones
-│   │   └── storage.js          # Subida de archivos
-│   ├── hooks/            # Custom hooks (useAuth, useAdminRole)
-│   ├── navigation/       # AppNavigator (Stack + Bottom Tabs)
-│   ├── screens/          # Pantallas de la aplicación
-│   └── theme/            # Paleta de colores, tipografía, spacing
-├── assets/               # Imágenes y recursos estáticos
-├── seed.mjs              # Script de inicialización de datos
-├── firestore.rules       # Reglas de seguridad de Firestore
-└── App.js                # Entry point
+│   ├── components/
+│   │   ├── DestinationCard.jsx    # Tarjeta de destino
+│   │   ├── SearchBar.jsx          # Barra de búsqueda
+│   │   └── CategoryChip.jsx       # Chip de categoría
+│   ├── firebase/
+│   │   ├── firebaseConfig.js      # SDK config (⚠️ credenciales — no subir)
+│   │   ├── auth.js                # Registro, login, logout
+│   │   ├── firestore.js           # CRUD destinos, hospedajes, reservaciones
+│   │   └── storage.js             # Subida de imágenes (base64 → Firebase Storage)
+│   ├── hooks/
+│   │   ├── useAuth.js             # Hook de autenticación Firebase
+│   │   └── useAdminRole.js        # Hook de verificación de rol admin
+│   ├── navigation/
+│   │   └── AppNavigator.jsx       # Stack + Bottom Tabs navigation
+│   ├── screens/
+│   │   ├── LoginScreen.jsx
+│   │   ├── RegisterScreen.jsx
+│   │   ├── HomeScreen.jsx         # Destinos destacados + FAB admin
+│   │   ├── ExploreScreen.jsx      # Búsqueda y filtros
+│   │   ├── DestinationDetailScreen.jsx
+│   │   ├── BookingScreen.jsx      # Reserva con DateTimePicker nativo
+│   │   ├── ProfileScreen.jsx      # Perfil + Mis Reservas (tickets)
+│   │   └── AdminPanelScreen.jsx   # CRUD admin + upload imágenes
+│   └── theme/
+│       └── theme.js               # Paleta, tipografía, spacing, shadows
+├── assets/
+├── seed.mjs                       # Script de datos iniciales (requiere serviceAccountKey)
+├── firestore.rules                # Reglas de seguridad Firestore
+├── .gitignore
+└── App.js
 ```
 
 ---
 
 ## 👤 Usuario Administrador
 
-Al ejecutar `node seed.mjs`, se crea automáticamente un usuario administrador:
+Al ejecutar `node seed.mjs` se crea automáticamente:
 
 | Campo | Valor |
 |---|---|
@@ -130,29 +159,49 @@ Al ejecutar `node seed.mjs`, se crea automáticamente un usuario administrador:
 
 > ⚠️ Cambia la contraseña después del primer inicio de sesión.
 
+Para asignar el rol manualmente, actualiza el campo `rol: "admin"` en el documento del usuario en la colección `users` de Firestore.
+
 ---
 
-## 🔐 Reglas de Seguridad (Firestore)
+## 🔐 Seguridad
 
-Las reglas en `firestore.rules` garantizan que:
-- Los usuarios autenticados pueden **leer** destinos y hospedajes
-- Solo los **admins** pueden crear, editar o eliminar contenido
-- Cada usuario solo puede ver y modificar **sus propias** reservaciones y perfil
+- `firebaseConfig.js` y `serviceAccountKey.json` están en `.gitignore` — **nunca se suben al repositorio**
+- Las reglas en `firestore.rules` garantizan que:
+  - Usuarios autenticados pueden **leer** destinos y hospedajes
+  - Solo los **admins** pueden crear, editar o eliminar contenido
+  - Cada usuario solo puede ver **sus propias** reservaciones y perfil
+- Las imágenes se suben a Firebase Storage usando `uploadString` con codificación base64 (compatible con Expo Go en Android/iOS)
 
 ---
 
 ## 📱 Pantallas
 
-| Pantalla | Ruta | Descripción |
+| Pantalla | Componente | Descripción |
 |---|---|---|
 | Login | `LoginScreen` | Inicio de sesión |
 | Registro | `RegisterScreen` | Creación de cuenta con datos personales |
-| Home | `HomeScreen` | Destinos destacados + FAB admin |
-| Explorar | `ExploreScreen` | Todos los destinos con filtros |
+| Home | `HomeScreen` | Destinos destacados + botón flotante admin |
+| Explorar | `ExploreScreen` | Todos los destinos con filtros y búsqueda |
 | Detalle | `DestinationDetailScreen` | Info completa del destino |
-| Reservar | `BookingScreen` | Formulario de reservación |
-| Perfil | `ProfileScreen` | Datos del usuario |
-| Admin | `AdminPanelScreen` | CRUD destinos y hospedajes (admin only) |
+| Reservar | `BookingScreen` | Formulario con selector de fechas nativo |
+| Perfil | `ProfileScreen` | Datos del usuario + panel "Mis Reservas" |
+| Admin | `AdminPanelScreen` | CRUD destinos/hospedajes + subida de imágenes |
+
+---
+
+## 🔧 Notas técnicas importantes
+
+### Subida de imágenes en React Native
+La app usa `expo-file-system/legacy` para leer imágenes como base64 y `uploadString` de Firebase Storage — evitando los problemas de `fetch().blob()` con URIs `content://` de la galería Android.
+
+### DateTimePicker en Android
+Se usa `onChange` (deprecated en v9 pero funcional) en lugar de `onValueChange`, ya que `onValueChange` en `@react-native-community/datetimepicker@9.1.0` tiene un bug conocido en Android donde devuelve `undefined` con `display="default"`.
+
+### Roles de usuario
+El rol se guarda en Firestore (`users/{uid}.rol`). El hook `useAdminRole` verifica el rol en tiempo real. El botón flotante de admin en `HomeScreen` y toda la pantalla `AdminPanelScreen` son visibles únicamente para usuarios con `rol === 'admin'`.
+
+### Reservaciones
+El puente `createBooking` en `firestore.js` mapea campos en inglés (UI) a campos en español (Firestore schema). Las consultas usan ordenamiento del lado del cliente para evitar la necesidad de índices compuestos en Firestore.
 
 ---
 

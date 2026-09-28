@@ -1,7 +1,4 @@
-// ============================================================
-// DestinationCard – Tarjeta de destino turístico
-// ============================================================
-
+﻿
 import React from 'react';
 import { View, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { Text } from 'react-native-paper';
@@ -26,7 +23,7 @@ export default function DestinationCard({ destination, onPress }) {
       onPress={onPress}
       activeOpacity={0.92}
     >
-      {/* Imagen */}
+      {}
       <View style={styles.imageContainer}>
         {imageUrl ? (
           <Image source={{ uri: imageUrl }} style={styles.image} />
@@ -42,7 +39,7 @@ export default function DestinationCard({ destination, onPress }) {
         ) : null}
       </View>
 
-      {/* Contenido */}
+      {}
       <View style={styles.content}>
         <View style={styles.topRow}>
           <Text style={styles.name} numberOfLines={1}>{name}</Text>

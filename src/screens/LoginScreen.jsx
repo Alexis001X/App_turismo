@@ -1,7 +1,4 @@
-// ============================================================
-// LoginScreen – Pantalla de inicio de sesión
-// ============================================================
-
+﻿
 import React, { useState } from 'react';
 import {
   View,
@@ -46,14 +43,14 @@ export default function LoginScreen({ navigation }) {
       <StatusBar style="light" />
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
 
-        {/* Header */}
+        {}
         <View style={styles.header}>
           <Text style={styles.emoji}>🌍</Text>
           <Text style={styles.title}>Bienvenido</Text>
           <Text style={styles.subtitle}>Descubre los mejores destinos del mundo</Text>
         </View>
 
-        {/* Formulario */}
+        {}
         <View style={styles.form}>
           <TextInput
             id="login-email-input"

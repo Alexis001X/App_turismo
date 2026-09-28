@@ -1,7 +1,4 @@
-// ============================================================
-// HomeScreen – Pantalla principal con destinos destacados
-// ============================================================
-
+﻿
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -78,7 +75,7 @@ export default function HomeScreen({ navigation }) {
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={[colors.primary]} />}
       >
-        {/* Header */}
+        {}
         <View style={styles.header}>
           <View>
             <Text style={styles.greeting}>Hola, {firstName} 👋</Text>
@@ -93,7 +90,7 @@ export default function HomeScreen({ navigation }) {
           </TouchableOpacity>
         </View>
 
-        {/* Buscador */}
+        {}
         <View style={styles.searchWrapper}>
           <SearchBar
             id="home-search-bar"
@@ -103,7 +100,7 @@ export default function HomeScreen({ navigation }) {
           />
         </View>
 
-        {/* Categorías */}
+        {}
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -119,7 +116,7 @@ export default function HomeScreen({ navigation }) {
           ))}
         </ScrollView>
 
-        {/* Destinos destacados */}
+        {}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>🔥 Destinos populares</Text>
@@ -154,7 +151,7 @@ export default function HomeScreen({ navigation }) {
         <View style={{ height: spacing['2xl'] }} />
       </ScrollView>
 
-      {/* FAB Admin – solo visible para administradores */}
+      {}
       {isAdmin && (
         <TouchableOpacity
           id="home-admin-fab"

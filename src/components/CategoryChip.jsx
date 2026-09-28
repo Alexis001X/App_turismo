@@ -1,7 +1,4 @@
-// ============================================================
-// CategoryChip – Chip de categoría seleccionable
-// ============================================================
-
+﻿
 import React from 'react';
 import { TouchableOpacity, StyleSheet } from 'react-native';
 import { Text } from 'react-native-paper';

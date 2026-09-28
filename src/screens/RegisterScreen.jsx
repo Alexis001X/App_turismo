@@ -1,8 +1,4 @@
-// ============================================================
-// RegisterScreen – Pantalla de registro de usuario
-// Campos: nombre, email, cédula, dirección, ciudad, contraseña
-// ============================================================
-
+﻿
 import React, { useState } from 'react';
 import {
   View,
@@ -64,17 +60,17 @@ export default function RegisterScreen({ navigation }) {
       <StatusBar style="light" />
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
 
-        {/* Header */}
+        {}
         <View style={styles.header}>
           <Text style={styles.emoji}>✈️</Text>
           <Text style={styles.title}>Crea tu cuenta</Text>
           <Text style={styles.subtitle}>Únete y comienza a explorar el mundo</Text>
         </View>
 
-        {/* Formulario */}
+        {}
         <View style={styles.form}>
 
-          {/* ── Datos personales ── */}
+          {}
           <Text style={styles.sectionLabel}>DATOS PERSONALES</Text>
 
           <TextInput
@@ -126,7 +122,7 @@ export default function RegisterScreen({ navigation }) {
             left={<TextInput.Icon icon="city-variant-outline" color={colors.textSecondary} />}
           />
 
-          {/* ── Acceso ── */}
+          {}
           <Text style={[styles.sectionLabel, { marginTop: spacing.sm }]}>ACCESO A LA CUENTA</Text>
 
           <TextInput

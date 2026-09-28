@@ -2,8 +2,9 @@
 // FIREBASE STORAGE – Gestión de archivos e imágenes
 // ============================================================
 
-import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from 'firebase/storage';
+import { ref, uploadBytesResumable, uploadString, getDownloadURL, deleteObject } from 'firebase/storage';
 import { storage } from './firebaseConfig';
+import * as FileSystem from 'expo-file-system/legacy';
 
 /**
  * Subir una imagen de perfil de usuario
@@ -40,9 +41,9 @@ export const deleteFile = async (fileUrl) => {
 };
 
 // ─── Helper interno ────────────────────────────────────────
-const _uploadFile = (storageRef, blob, onProgress) => {
+const _uploadFile = (storageRef, data, onProgress) => {
   return new Promise((resolve, reject) => {
-    const uploadTask = uploadBytesResumable(storageRef, blob);
+    const uploadTask = uploadBytesResumable(storageRef, data);
 
     uploadTask.on(
       'state_changed',
@@ -57,4 +58,34 @@ const _uploadFile = (storageRef, blob, onProgress) => {
       }
     );
   });
+};
+
+/**
+ * Subir imagen desde URI local (expo-image-picker) a Firebase Storage.
+ *
+ * Usa expo-file-system para leer la imagen como base64 y convertirla a
+ * Uint8Array antes de subirla, evitando el problema de React Native's
+ * Blob store (fetch().blob()) que falla con URIs de galería (content://).
+ *
+ * @param {string} localUri  - URI local devuelta por expo-image-picker
+ * @param {string} folder    - Carpeta en Storage ('destinos', 'hospedajes', etc.)
+ * @param {Function} onProgress - Callback de progreso (0–100)
+ * @returns {Promise<string>} URL pública de descarga
+ */
+export const uploadImageFromUri = async (localUri, folder = 'admin_images', onProgress) => {
+  // 1. Leer el archivo como base64 con expo-file-system/legacy
+  const base64 = await FileSystem.readAsStringAsync(localUri, {
+    encoding: FileSystem.EncodingType.Base64,
+  });
+
+  // 2. Subir directamente como string base64 con uploadString
+  //    (uploadBytesResumable no acepta Uint8Array/ArrayBuffer en React Native)
+  const fileName = `${Date.now()}_${Math.random().toString(36).substring(2, 8)}.jpg`;
+  const storageRef = ref(storage, `${folder}/${fileName}`);
+
+  const snapshot = await uploadString(storageRef, base64, 'base64', {
+    contentType: 'image/jpeg',
+  });
+
+  return getDownloadURL(snapshot.ref);
 };

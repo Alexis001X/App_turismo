@@ -1,7 +1,4 @@
-// ============================================================
-// ExploreScreen – Pantalla de exploración de destinos
-// ============================================================
-
+﻿
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import { Text, ActivityIndicator } from 'react-native-paper';
@@ -54,13 +51,13 @@ export default function ExploreScreen({ navigation }) {
     <View style={styles.container}>
       <StatusBar style="dark" />
 
-      {/* Header */}
+      {}
       <View style={styles.header}>
         <Text style={styles.title}>🌐 Explorar</Text>
         <Text style={styles.subtitle}>{filtered.length} destinos disponibles</Text>
       </View>
 
-      {/* Buscador */}
+      {}
       <View style={styles.searchWrapper}>
         <SearchBar
           id="explore-search-bar"
@@ -70,7 +67,7 @@ export default function ExploreScreen({ navigation }) {
         />
       </View>
 
-      {/* Categorías */}
+      {}
       <FlatList
         horizontal
         data={CATEGORIES}
@@ -86,7 +83,7 @@ export default function ExploreScreen({ navigation }) {
         showsHorizontalScrollIndicator={false}
       />
 
-      {/* Lista de destinos */}
+      {}
       {loading ? (
         <ActivityIndicator color={colors.primary} style={styles.loader} />
       ) : (

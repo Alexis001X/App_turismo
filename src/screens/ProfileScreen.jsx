@@ -1,7 +1,4 @@
-// ============================================================
-// ProfileScreen – Perfil del usuario + Panel de Mis Reservas
-// ============================================================
-
+﻿
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
@@ -18,8 +15,6 @@ import { logoutUser } from '../firebase/auth';
 import { useAuth } from '../hooks/useAuth';
 import { getReservacionesByUser } from '../firebase/firestore';
 import { colors, spacing, typography, borderRadius, shadows } from '../theme/theme';
-
-// ─── Mapa de colores según estado ─────────────────────────
 const ESTADO_CONFIG = {
   pendiente:  { color: '#F59E0B', bg: '#FEF3C7', label: '⏳ Pendiente' },
   confirmada: { color: '#10B981', bg: '#D1FAE5', label: '✅ Confirmada' },
@@ -30,16 +25,12 @@ export default function ProfileScreen({ navigation }) {
   const { user } = useAuth();
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [darkModeEnabled, setDarkModeEnabled] = useState(false);
-
-  // ── Estado de reservas ─────────────────────────────────
   const [reservas, setReservas] = useState([]);
   const [loadingReservas, setLoadingReservas] = useState(false);
   const [showReservas, setShowReservas] = useState(false);
 
   const firstName = user?.displayName?.split(' ')[0] || 'Viajero';
   const avatarLetter = firstName.charAt(0).toUpperCase();
-
-  // ── Cargar reservas ────────────────────────────────────
   const fetchReservas = useCallback(async () => {
     if (!user?.uid) return;
     setLoadingReservas(true);
@@ -59,8 +50,6 @@ export default function ProfileScreen({ navigation }) {
     }
     setShowReservas((prev) => !prev);
   };
-
-  // ── Logout ─────────────────────────────────────────────
   const handleLogout = () => {
     Alert.alert(
       'Cerrar sesión',
@@ -81,8 +70,6 @@ export default function ProfileScreen({ navigation }) {
       ]
     );
   };
-
-  // ── Subcomponente MenuItem ─────────────────────────────
   const MenuItem = ({ icon, label, onPress, rightElement, color = colors.text }) => (
     <TouchableOpacity style={styles.menuItem} onPress={onPress} activeOpacity={0.7}>
       <View style={styles.menuItemLeft}>
@@ -94,13 +81,11 @@ export default function ProfileScreen({ navigation }) {
       {rightElement || <Ionicons name="chevron-forward" size={18} color={colors.textLight} />}
     </TouchableOpacity>
   );
-
-  // ── Ticket de reserva ──────────────────────────────────
   const ReservaTicket = ({ item }) => {
     const estado = ESTADO_CONFIG[item.estado] || ESTADO_CONFIG.pendiente;
     return (
       <View style={styles.ticket}>
-        {/* Cabecera del ticket */}
+        {}
         <View style={styles.ticketHeader}>
           <View style={{ flex: 1 }}>
             <Text style={styles.ticketDestino} numberOfLines={1}>
@@ -121,7 +106,7 @@ export default function ProfileScreen({ navigation }) {
 
         <Divider style={styles.ticketDivider} />
 
-        {/* Detalles del ticket */}
+        {}
         <View style={styles.ticketBody}>
           <View style={styles.ticketRow}>
             <Ionicons name="calendar-outline" size={14} color={colors.textSecondary} />
@@ -149,7 +134,7 @@ export default function ProfileScreen({ navigation }) {
           ) : null}
         </View>
 
-        {/* Código único */}
+        {}
         <View style={styles.ticketFooter}>
           <Text style={styles.ticketCode}>🎫 {item.codigoUnico}</Text>
         </View>
@@ -161,7 +146,7 @@ export default function ProfileScreen({ navigation }) {
     <View style={styles.container}>
       <StatusBar style="light" />
 
-      {/* Header */}
+      {}
       <View style={styles.header}>
         <View style={styles.avatar}>
           <Text style={styles.avatarText}>{avatarLetter}</Text>
@@ -175,14 +160,14 @@ export default function ProfileScreen({ navigation }) {
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
 
-        {/* ── Sección Cuenta ──────────────────────────────── */}
+        {}
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>MI CUENTA</Text>
           <View style={styles.card}>
             <MenuItem icon="person-outline" label="Editar perfil" onPress={() => {}} />
             <Divider style={styles.divider} />
 
-            {/* Mis Reservas — expansible */}
+            {}
             <MenuItem
               icon="calendar-outline"
               label="Mis reservas"
@@ -196,7 +181,7 @@ export default function ProfileScreen({ navigation }) {
               }
             />
 
-            {/* Panel de reservas expandido */}
+            {}
             {showReservas && (
               <View style={styles.reservasPanel}>
                 {loadingReservas ? (
@@ -239,7 +224,7 @@ export default function ProfileScreen({ navigation }) {
           </View>
         </View>
 
-        {/* ── Sección Preferencias ────────────────────────── */}
+        {}
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>PREFERENCIAS</Text>
           <View style={styles.card}>
@@ -271,7 +256,7 @@ export default function ProfileScreen({ navigation }) {
           </View>
         </View>
 
-        {/* ── Sección Soporte ─────────────────────────────── */}
+        {}
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>SOPORTE</Text>
           <View style={styles.card}>
@@ -283,7 +268,7 @@ export default function ProfileScreen({ navigation }) {
           </View>
         </View>
 
-        {/* Cerrar sesión */}
+        {}
         <Button
           id="profile-logout-btn"
           mode="outlined"
@@ -306,8 +291,6 @@ export default function ProfileScreen({ navigation }) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
-
-  // Header
   header: {
     backgroundColor: colors.primary,
     paddingTop: 60,
@@ -338,8 +321,6 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.full,
   },
   statsText: { color: colors.white, fontSize: typography.fontSize.sm, fontWeight: '600' },
-
-  // Content
   content: { flex: 1, padding: spacing.lg },
   section: { marginBottom: spacing.lg },
   sectionLabel: {
@@ -356,8 +337,6 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     ...shadows.sm,
   },
-
-  // MenuItem
   menuItem: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -375,8 +354,6 @@ const styles = StyleSheet.create({
   },
   menuLabel: { fontSize: typography.fontSize.base, fontWeight: '500' },
   divider: { backgroundColor: colors.border, marginHorizontal: spacing.md },
-
-  // Panel de reservas
   reservasPanel: {
     paddingHorizontal: spacing.md,
     paddingBottom: spacing.md,
@@ -390,8 +367,6 @@ const styles = StyleSheet.create({
     marginBottom: spacing.sm,
     marginTop: spacing.sm,
   },
-
-  // Empty state
   emptyReservas: {
     alignItems: 'center',
     paddingVertical: spacing.xl,
@@ -403,8 +378,6 @@ const styles = StyleSheet.create({
     fontSize: typography.fontSize.sm,
     lineHeight: 20,
   },
-
-  // Ticket de reserva
   ticket: {
     backgroundColor: colors.white,
     borderRadius: borderRadius.md,
@@ -468,8 +441,6 @@ const styles = StyleSheet.create({
     fontFamily: 'monospace',
     letterSpacing: 1,
   },
-
-  // Logout
   logoutBtn: {
     borderRadius: borderRadius.lg,
     borderColor: colors.error,

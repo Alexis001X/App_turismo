@@ -1,7 +1,4 @@
-// ============================================================
-// DestinationDetailScreen – Detalle de un destino turístico
-// ============================================================
-
+﻿
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -46,7 +43,7 @@ export default function DestinationDetailScreen({ route, navigation }) {
       <StatusBar style="light" />
 
       <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Hero Image */}
+        {}
         <View style={styles.heroContainer}>
           {destination.imageUrl ? (
             <Image source={{ uri: destination.imageUrl }} style={styles.heroImage} />
@@ -56,7 +53,7 @@ export default function DestinationDetailScreen({ route, navigation }) {
             </View>
           )}
 
-          {/* Overlay de navegación */}
+          {}
           <View style={styles.heroOverlay}>
             <TouchableOpacity
               id="detail-back-btn"
@@ -79,9 +76,9 @@ export default function DestinationDetailScreen({ route, navigation }) {
           </View>
         </View>
 
-        {/* Contenido */}
+        {}
         <View style={styles.content}>
-          {/* Nombre y ubicación */}
+          {}
           <View style={styles.titleRow}>
             <View style={{ flex: 1 }}>
               <Text style={styles.destinationName}>{destination.name || 'Sin nombre'}</Text>
@@ -97,7 +94,7 @@ export default function DestinationDetailScreen({ route, navigation }) {
             )}
           </View>
 
-          {/* Chips de características */}
+          {}
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.chipsRow}>
             {destination.category && (
               <Chip style={styles.chip} textStyle={styles.chipText}>{destination.category}</Chip>
@@ -112,7 +109,7 @@ export default function DestinationDetailScreen({ route, navigation }) {
 
           <Divider style={styles.divider} />
 
-          {/* Descripción */}
+          {}
           <Text style={styles.sectionTitle}>Descripción</Text>
           <Text style={styles.description}>
             {destination.description || 'Sin descripción disponible para este destino.'}
@@ -120,7 +117,7 @@ export default function DestinationDetailScreen({ route, navigation }) {
 
           <Divider style={styles.divider} />
 
-          {/* Precio */}
+          {}
           {destination.price && (
             <View style={styles.priceRow}>
               <Text style={styles.priceLabel}>Precio desde</Text>
@@ -128,7 +125,7 @@ export default function DestinationDetailScreen({ route, navigation }) {
             </View>
           )}
 
-          {/* Reseñas */}
+          {}
           <Text style={styles.sectionTitle}>
             Reseñas {reviews.length > 0 ? `(${reviews.length})` : ''}
           </Text>
@@ -148,7 +145,7 @@ export default function DestinationDetailScreen({ route, navigation }) {
         </View>
       </ScrollView>
 
-      {/* Botón de reserva flotante */}
+      {}
       <View style={styles.bottomBar}>
         <Button
           id="detail-book-btn"

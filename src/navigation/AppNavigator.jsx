@@ -1,15 +1,10 @@
-// ============================================================
-// AppNavigator – Navegación principal de la app
-// ============================================================
-
+﻿
 import React from 'react';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
-
-// Screens
 import LoginScreen from '../screens/LoginScreen';
 import RegisterScreen from '../screens/RegisterScreen';
 import HomeScreen from '../screens/HomeScreen';
@@ -18,15 +13,11 @@ import DestinationDetailScreen from '../screens/DestinationDetailScreen';
 import BookingScreen from '../screens/BookingScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import AdminPanelScreen from '../screens/AdminPanelScreen';
-
-// Hooks & Theme
 import { useAuth } from '../hooks/useAuth';
 import { colors, typography } from '../theme/theme';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
-
-// ─── Tab Navigator (pantallas principales) ─────────────────
 function MainTabs() {
   return (
     <Tab.Navigator
@@ -62,8 +53,6 @@ function MainTabs() {
     </Tab.Navigator>
   );
 }
-
-// ─── Auth Stack (login / registro) ────────────────────────
 function AuthStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
@@ -72,8 +61,6 @@ function AuthStack() {
     </Stack.Navigator>
   );
 }
-
-// ─── App Stack (pantallas de la app con sesión) ────────────
 function AppStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
@@ -96,8 +83,6 @@ function AppStack() {
     </Stack.Navigator>
   );
 }
-
-// ─── Root Navigator ────────────────────────────────────────
 export default function AppNavigator() {
   const { user, loading } = useAuth();
 

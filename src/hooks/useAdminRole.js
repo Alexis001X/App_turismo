@@ -1,15 +1,8 @@
-// ============================================================
-// useAdminRole – Hook para verificar si el usuario actual es admin
-// Consulta el campo 'rol' en Firestore /users/{uid}
-// ============================================================
-
+﻿
 import { useState, useEffect } from 'react';
 import { getUserProfile } from '../firebase/firestore';
 import { useAuth } from './useAuth';
 
-/**
- * @returns {{ isAdmin: boolean, loadingRole: boolean }}
- */
 export const useAdminRole = () => {
   const { user, loading } = useAuth();
   const [isAdmin, setIsAdmin] = useState(false);

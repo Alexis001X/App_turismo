@@ -1,7 +1,4 @@
-// ============================================================
-// SearchBar – Barra de búsqueda reutilizable
-// ============================================================
-
+﻿
 import React from 'react';
 import { View, StyleSheet, TextInput as RNTextInput } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
